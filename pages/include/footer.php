@@ -17,7 +17,7 @@
                 <div class="col-md-4 mb-4">
                     <h5>Follow Us</h5>
                     <a href="https://www.facebook.com/YASIRADNANSAMI" target="_blank" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/nerd_potatoo/" target="_blank" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/_myself_mishu/" target="_blank" class="text-light me-3"><i class="fab fa-instagram"></i></a>
                     <a href="https://www.linkedin.com/in/yasiradnan-/" target="_blank" class="text-light"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
