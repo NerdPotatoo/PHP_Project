@@ -39,6 +39,9 @@ if(isset($_GET['page'])) {
     else if($_GET['page'] == 'admin/customers') {
         include 'pages/admin/customers.php';
     }
+    else if($_GET['page'] == 'admin/contacts') {
+        include 'pages/admin/contacts.php';
+    }
     else if($_GET['page'] == 'admin/login') {
         include 'pages/admin/login.php';
     }

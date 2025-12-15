@@ -65,6 +65,19 @@ CREATE TABLE IF NOT EXISTS order_items (
         ON DELETE CASCADE
 );
 
+-- Contacts table for storing contact form submissions
+CREATE TABLE IF NOT EXISTS contacts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    phone VARCHAR(20),
+    subject VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    subscribe BOOLEAN DEFAULT 0,
+    status ENUM('New', 'Read', 'Replied', 'Closed') NOT NULL DEFAULT 'New',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert default admin user (username: admin, password: admin123)
 INSERT INTO admins (username, password_hash) VALUES 
 ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');

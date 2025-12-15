@@ -35,6 +35,26 @@ $topProductsQuery = "SELECT p.title, p.image, COUNT(oi.id) as sales_count, SUM(o
                      LIMIT 5";
 $topProducts = $conn->query($topProductsQuery)->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch pending orders count
+$pendingOrders = $conn->query("SELECT COUNT(*) as count FROM orders WHERE status = 'Pending'")->fetch()['count'] ?? 0;
+
+// Fetch new contact messages
+$newContacts = $conn->query("SELECT COUNT(*) as count FROM contacts WHERE status = 'New'")->fetch()['count'] ?? 0;
+
+// Fetch recent contacts
+$recentContactsQuery = "SELECT id, name, email, subject, status, created_at 
+                        FROM contacts 
+                        ORDER BY created_at DESC 
+                        LIMIT 5";
+$recentContacts = $conn->query($recentContactsQuery)->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch low stock products
+$lowStockQuery = "SELECT id, title, stock FROM products WHERE stock < 10 AND stock > 0 ORDER BY stock ASC LIMIT 5";
+$lowStockProducts = $conn->query($lowStockQuery)->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch out of stock count
+$outOfStock = $conn->query("SELECT COUNT(*) as count FROM products WHERE stock = 0")->fetch()['count'] ?? 0;
+
 include "include/header.php"; 
 ?>
 
@@ -105,13 +125,72 @@ include "include/header.php";
         </div>
     </div>
 
+    <!-- Quick Stats Row -->
+    <?php if ($pendingOrders > 0 || $outOfStock > 0 || $newContacts > 0): ?>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <?php if ($pendingOrders > 0): ?>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-yellow-700 mb-1">Pending Orders</p>
+                    <h3 class="text-2xl font-bold text-yellow-800"><?php echo $pendingOrders; ?></h3>
+                    <p class="text-sm text-yellow-600 mt-2">Require attention</p>
+                </div>
+                <div class="p-3 bg-yellow-100 rounded-full text-yellow-600">
+                    <i class="fas fa-clock text-2xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="?page=admin/orders" class="text-yellow-700 text-sm font-medium hover:underline">View pending orders →</a>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($outOfStock > 0): ?>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-red-700 mb-1">Out of Stock</p>
+                    <h3 class="text-2xl font-bold text-red-800"><?php echo $outOfStock; ?></h3>
+                    <p class="text-sm text-red-600 mt-2">Products need restocking</p>
+                </div>
+                <div class="p-3 bg-red-100 rounded-full text-red-600">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="?page=admin/products" class="text-red-700 text-sm font-medium hover:underline">View products →</a>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($newContacts > 0): ?>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-blue-700 mb-1">New Messages</p>
+                    <h3 class="text-2xl font-bold text-blue-800"><?php echo $newContacts; ?></h3>
+                    <p class="text-sm text-blue-600 mt-2">Unread contact messages</p>
+                </div>
+                <div class="p-3 bg-blue-100 rounded-full text-blue-600">
+                    <i class="fas fa-envelope text-2xl"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="?page=admin/contacts" class="text-blue-700 text-sm font-medium hover:underline">View messages →</a>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
     <!-- Recent Orders & Top Products -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Recent Orders -->
         <div class="lg:col-span-2 bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-gray-800">Recent Orders</h3>
-                <button class="text-primary hover:text-primary-dark text-sm font-medium">View All</button>
+                <a href="?page=admin/orders" class="text-primary hover:text-primary-dark text-sm font-medium">View All</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -125,51 +204,62 @@ include "include/header.php";
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 text-sm">
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="p-4 font-medium text-gray-900">#ORD-7829</td>
-                            <td class="p-4 text-gray-600">John Doe</td>
-                            <td class="p-4 text-gray-600">Wireless Headphones</td>
-                            <td class="p-4 font-medium text-gray-900">$79.99</td>
-                            <td class="p-4">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Completed</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="p-4 font-medium text-gray-900">#ORD-7828</td>
-                            <td class="p-4 text-gray-600">Jane Smith</td>
-                            <td class="p-4 text-gray-600">Smart Watch Series 5</td>
-                            <td class="p-4 font-medium text-gray-900">$199.50</td>
-                            <td class="p-4">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">Pending</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="p-4 font-medium text-gray-900">#ORD-7827</td>
-                            <td class="p-4 text-gray-600">Robert Johnson</td>
-                            <td class="p-4 text-gray-600">Gaming Mouse</td>
-                            <td class="p-4 font-medium text-gray-900">$45.00</td>
-                            <td class="p-4">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">Processing</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="p-4 font-medium text-gray-900">#ORD-7826</td>
-                            <td class="p-4 text-gray-600">Emily Davis</td>
-                            <td class="p-4 text-gray-600">Mechanical Keyboard</td>
-                            <td class="p-4 font-medium text-gray-900">$120.00</td>
-                            <td class="p-4">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Completed</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="p-4 font-medium text-gray-900">#ORD-7825</td>
-                            <td class="p-4 text-gray-600">Michael Wilson</td>
-                            <td class="p-4 text-gray-600">USB-C Hub</td>
-                            <td class="p-4 font-medium text-gray-900">$35.99</td>
-                            <td class="p-4">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Cancelled</span>
-                            </td>
-                        </tr>
+                        <?php if (empty($recentOrders)): ?>
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-gray-500">
+                                    <i class="fas fa-shopping-cart text-4xl mb-2 text-gray-300"></i>
+                                    <p>No recent orders</p>
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php 
+                            $statusColors = [
+                                'Pending' => 'bg-yellow-100 text-yellow-700',
+                                'Processing' => 'bg-blue-100 text-blue-700',
+                                'Completed' => 'bg-green-100 text-green-700',
+                                'Cancelled' => 'bg-red-100 text-red-700'
+                            ];
+                            foreach ($recentOrders as $order): 
+                                $statusColor = $statusColors[$order['status']] ?? 'bg-gray-100 text-gray-700';
+                                
+                                // Get order items for this order
+                                $itemsQuery = "SELECT p.title FROM order_items oi 
+                                             LEFT JOIN products p ON oi.product_id = p.id 
+                                             WHERE oi.order_id = ? LIMIT 1";
+                                $itemsStmt = $conn->prepare($itemsQuery);
+                                $itemsStmt->execute([$order['id']]);
+                                $firstItem = $itemsStmt->fetch(PDO::FETCH_ASSOC);
+                                
+                                // Count total items
+                                $countQuery = "SELECT COUNT(*) as count FROM order_items WHERE order_id = ?";
+                                $countStmt = $conn->prepare($countQuery);
+                                $countStmt->execute([$order['id']]);
+                                $itemCount = $countStmt->fetch()['count'];
+                            ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 font-medium text-primary">#<?php echo $order['id']; ?></td>
+                                <td class="p-4 text-gray-600"><?php echo htmlspecialchars($order['customer_name'] ?? 'Unknown'); ?></td>
+                                <td class="p-4 text-gray-600">
+                                    <?php 
+                                    if ($firstItem) {
+                                        echo htmlspecialchars($firstItem['title']);
+                                        if ($itemCount > 1) {
+                                            echo ' <span class="text-xs text-gray-400">(+' . ($itemCount - 1) . ' more)</span>';
+                                        }
+                                    } else {
+                                        echo 'No items';
+                                    }
+                                    ?>
+                                </td>
+                                <td class="p-4 font-medium text-gray-900">$<?php echo number_format($order['total_amount'], 2); ?></td>
+                                <td class="p-4">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full <?php echo $statusColor; ?>">
+                                        <?php echo htmlspecialchars($order['status']); ?>
+                                    </span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -181,66 +271,165 @@ include "include/header.php";
                 <h3 class="text-lg font-bold text-gray-800">Top Selling Products</h3>
             </div>
             <div class="p-6 space-y-6">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
-                        <img src="https://picsum.photos/100/100?random=1" alt="Product" class="w-full h-full object-cover">
+                <?php if (empty($topProducts)): ?>
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-box-open text-4xl mb-2 text-gray-300"></i>
+                        <p>No product sales yet</p>
                     </div>
-                    <div class="ml-4 flex-1">
-                        <h4 class="text-sm font-medium text-gray-900">Wireless Headphones</h4>
-                        <p class="text-xs text-gray-500">Electronics</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-gray-900">$12.5k</p>
-                        <p class="text-xs text-green-500">124 sales</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center">
-                    <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
-                        <img src="https://picsum.photos/100/100?random=2" alt="Product" class="w-full h-full object-cover">
-                    </div>
-                    <div class="ml-4 flex-1">
-                        <h4 class="text-sm font-medium text-gray-900">Smart Watch</h4>
-                        <p class="text-xs text-gray-500">Accessories</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-gray-900">$9.8k</p>
-                        <p class="text-xs text-green-500">89 sales</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center">
-                    <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
-                        <img src="https://picsum.photos/100/100?random=3" alt="Product" class="w-full h-full object-cover">
-                    </div>
-                    <div class="ml-4 flex-1">
-                        <h4 class="text-sm font-medium text-gray-900">Running Shoes</h4>
-                        <p class="text-xs text-gray-500">Fashion</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-gray-900">$8.2k</p>
-                        <p class="text-xs text-green-500">65 sales</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center">
-                    <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
-                        <img src="https://picsum.photos/100/100?random=4" alt="Product" class="w-full h-full object-cover">
-                    </div>
-                    <div class="ml-4 flex-1">
-                        <h4 class="text-sm font-medium text-gray-900">Coffee Maker</h4>
-                        <p class="text-xs text-gray-500">Home</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-gray-900">$5.4k</p>
-                        <p class="text-xs text-green-500">42 sales</p>
-                    </div>
-                </div>
+                <?php else: ?>
+                    <?php foreach ($topProducts as $product): ?>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
+                                <?php if ($product['image']): ?>
+                                    <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['title']); ?>" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h4 class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($product['title']); ?></h4>
+                                <p class="text-xs text-gray-500"><?php echo $product['sales_count'] > 0 ? $product['sales_count'] . ' sales' : 'No sales'; ?></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-gray-900">$<?php echo number_format($product['revenue'] ?? 0, 2); ?></p>
+                                <?php if ($product['sales_count'] > 0): ?>
+                                    <p class="text-xs text-green-500"><?php echo $product['sales_count']; ?> sold</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
             <div class="p-4 border-t border-gray-100 text-center">
-                <a href="#" class="text-primary text-sm font-medium hover:underline">View All Products</a>
+                <a href="?page=admin/products" class="text-primary text-sm font-medium hover:underline">View All Products</a>
             </div>
         </div>
     </div>
+
+    <!-- Low Stock Alert -->
+    <?php if (!empty($lowStockProducts)): ?>
+    <div class="mt-8 bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold text-gray-800">Low Stock Alert</h3>
+                <p class="text-sm text-gray-500 mt-1">Products with less than 10 items in stock</p>
+            </div>
+            <a href="?page=admin/products" class="text-primary hover:text-primary-dark text-sm font-medium">View All Products</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider">
+                        <th class="p-4 font-semibold">Product ID</th>
+                        <th class="p-4 font-semibold">Product Name</th>
+                        <th class="p-4 font-semibold">Stock Level</th>
+                        <th class="p-4 font-semibold">Status</th>
+                        <th class="p-4 font-semibold text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                    <?php foreach ($lowStockProducts as $product): ?>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4 font-medium text-gray-900">#<?php echo $product['id']; ?></td>
+                        <td class="p-4 text-gray-900"><?php echo htmlspecialchars($product['title']); ?></td>
+                        <td class="p-4">
+                            <div class="flex items-center">
+                                <div class="w-24 bg-gray-200 rounded-full h-2 mr-2">
+                                    <div class="bg-<?php echo $product['stock'] < 5 ? 'red' : 'yellow'; ?>-500 h-2 rounded-full" style="width: <?php echo min(100, $product['stock'] * 10); ?>%"></div>
+                                </div>
+                                <span class="font-medium <?php echo $product['stock'] < 5 ? 'text-red-600' : 'text-yellow-600'; ?>">
+                                    <?php echo $product['stock']; ?> units
+                                </span>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full <?php echo $product['stock'] < 5 ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'; ?>">
+                                <?php echo $product['stock'] < 5 ? 'Critical' : 'Low Stock'; ?>
+                            </span>
+                        </td>
+                        <td class="p-4 text-right">
+                            <a href="?page=admin/add-product&id=<?php echo $product['id']; ?>" class="text-primary hover:text-primary-dark font-medium text-sm">
+                                <i class="fas fa-edit mr-1"></i>Restock
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Recent Contact Messages -->
+    <?php if (!empty($recentContacts)): ?>
+    <div id="contactSection" class="mt-8 bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold text-gray-800">Recent Contact Messages</h3>
+                <p class="text-sm text-gray-500 mt-1">Latest messages from customers</p>
+            </div>
+            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                <?php echo $newContacts; ?> New
+            </span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider">
+                        <th class="p-4 font-semibold">ID</th>
+                        <th class="p-4 font-semibold">Name</th>
+                        <th class="p-4 font-semibold">Email</th>
+                        <th class="p-4 font-semibold">Subject</th>
+                        <th class="p-4 font-semibold">Status</th>
+                        <th class="p-4 font-semibold">Date</th>
+                        <th class="p-4 font-semibold text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                    <?php 
+                    $statusColors = [
+                        'New' => 'bg-blue-100 text-blue-700',
+                        'Read' => 'bg-gray-100 text-gray-700',
+                        'Replied' => 'bg-green-100 text-green-700',
+                        'Closed' => 'bg-red-100 text-red-700'
+                    ];
+                    foreach ($recentContacts as $contact): 
+                        $statusColor = $statusColors[$contact['status']] ?? 'bg-gray-100 text-gray-700';
+                    ?>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4 font-medium text-gray-900">#<?php echo $contact['id']; ?></td>
+                        <td class="p-4 text-gray-900"><?php echo htmlspecialchars($contact['name']); ?></td>
+                        <td class="p-4 text-gray-600"><?php echo htmlspecialchars($contact['email']); ?></td>
+                        <td class="p-4 text-gray-900"><?php echo htmlspecialchars($contact['subject']); ?></td>
+                        <td class="p-4">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full <?php echo $statusColor; ?>">
+                                <?php echo htmlspecialchars($contact['status']); ?>
+                            </span>
+                        </td>
+                        <td class="p-4 text-gray-600"><?php echo date('M d, Y', strtotime($contact['created_at'])); ?></td>
+                        <td class="p-4 text-right">
+                            <a href="?page=admin/contacts&view=<?php echo $contact['id']; ?>" class="text-blue-500 hover:text-blue-700 font-medium text-sm">
+                                <i class="fas fa-eye mr-1"></i>View
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 border-t border-gray-100 text-center">
+            <p class="text-sm text-gray-500">Contact management page coming soon</p>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <script>
+        function viewContact(id) {
+            // TODO: Implement contact detail view
+            alert('Contact detail view will be implemented in admin panel. Contact ID: ' + id);
+        }
+    </script>
 
 <?php include "include/footer.php"; ?>
