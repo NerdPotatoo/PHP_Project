@@ -29,5 +29,13 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function addToCart(productId) {
+            // Placeholder for cart functionality
+            alert('Cart functionality will be implemented soon!\nProduct ID: ' + productId);
+            // TODO: Implement AJAX call to add product to cart
+        }
+    </script>
 </body>
 </html>

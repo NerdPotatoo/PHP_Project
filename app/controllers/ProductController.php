@@ -117,4 +117,34 @@ class ProductController {
             return [];
         }
     }
+
+    public function getFeaturedProducts($limit = 6) {
+        try {
+            $query = "SELECT p.*, c.name as category_name 
+                      FROM products p 
+                      LEFT JOIN categories c ON p.category_id = c.id 
+                      ORDER BY p.created_at DESC 
+                      LIMIT " . intval($limit);
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            return [];
+        }
+    }
+
+    public function getHeroStats() {
+        try {
+            $query = "SELECT 
+                (SELECT COUNT(*) FROM products WHERE stock > 0) as products_count,
+                (SELECT COUNT(*) FROM users) as customers_count,
+                (SELECT COUNT(*) FROM orders WHERE status = 'Completed') as orders_count
+            ";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            return ['products_count' => 0, 'customers_count' => 0, 'orders_count' => 0];
+        }
+    }
 }

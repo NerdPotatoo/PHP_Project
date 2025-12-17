@@ -1,17 +1,107 @@
 
-<?php include "include/header.php"; ?>
+<?php 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Controllers\ProductController;
+
+include "include/header.php"; 
+
+// Fetch featured products (latest 6 products)
+$productController = new ProductController();
+$featuredProducts = $productController->getFeaturedProducts(6);
+?>
 
     <!-- Hero Section -->
-    <section class="bg-white py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/2 mb-10 md:mb-0">
-                    <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">Welcome to <span class="text-primary">EShop</span></h1>
-                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">Discover amazing products at unbeatable prices. Shop now and enjoy fast delivery! Experience the best online shopping with us.</p>
-                    <a href="?page=products" class="inline-block bg-primary hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg transform hover:-translate-y-1">Start Shopping</a>
+    <section class="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-20 overflow-hidden">
+        <!-- Background decorative elements -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-80 h-80 bg-primary opacity-10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 opacity-10 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2 mb-10 md:mb-0 z-10">
+                    <div class="inline-block bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                        <i class="fas fa-star mr-2"></i>Trusted by 10,000+ Customers
+                    </div>
+                    <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 leading-tight">
+                        Shop Smart,<br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">Live Better</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">Discover premium products at unbeatable prices. Fast delivery, secure payments, and 30-day money-back guarantee.</p>
+                    
+                    <div class="flex flex-wrap gap-4 mb-8">
+                        <a href="?page=products" class="inline-flex items-center bg-primary hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-full transition duration-300 shadow-lg transform hover:-translate-y-1 hover:shadow-xl">
+                            <i class="fas fa-shopping-bag mr-2"></i>
+                            Start Shopping
+                        </a>
+                        <a href="?page=about" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-900 font-bold py-4 px-8 rounded-full transition duration-300 shadow-md border-2 border-gray-200">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Learn More
+                        </a>
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-6 pt-8 border-t border-gray-200">
+                        <?php
+                        // Fetch quick stats
+                        $stats = $productController->getHeroStats();
+                        ?>
+                        <div>
+                            <div class="text-3xl font-bold text-primary"><?php echo number_format($stats['products_count'] ?? 0); ?>+</div>
+                            <div class="text-sm text-gray-600">Products</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-primary"><?php echo number_format($stats['customers_count'] ?? 0); ?>+</div>
+                            <div class="text-sm text-gray-600">Customers</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold text-primary"><?php echo number_format($stats['orders_count'] ?? 0); ?>+</div>
+                            <div class="text-sm text-gray-600">Orders</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="md:w-1/2 md:pl-10">
-                    <img src="https://picsum.photos/600/400?random=1" alt="Shopping" class="rounded-lg shadow-2xl w-full object-cover transform hover:scale-105 transition duration-500">
+                
+                <div class="md:w-1/2 relative z-10">
+                    <!-- Product showcase grid -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <?php 
+                        $heroProducts = array_slice($featuredProducts, 0, 4);
+                        if (!empty($heroProducts)):
+                            foreach ($heroProducts as $index => $product): 
+                                $imagePath = !empty($product['image']) ? 'uploads/products/' . $product['image'] : 'https://via.placeholder.com/300x300?text=No+Image';
+                        ?>
+                            <div class="<?php echo $index === 0 ? 'col-span-2' : ''; ?> bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition duration-300 hover:shadow-2xl">
+                                <img src="<?php echo htmlspecialchars($imagePath); ?>" 
+                                     alt="<?php echo htmlspecialchars($product['title']); ?>" 
+                                     class="w-full <?php echo $index === 0 ? 'h-64' : 'h-40'; ?> object-cover">
+                                <div class="p-4">
+                                    <h6 class="font-bold text-gray-900 mb-1 truncate"><?php echo htmlspecialchars($product['title']); ?></h6>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-primary font-bold text-lg">$<?php echo number_format($product['price'], 2); ?></span>
+                                        <?php if ($product['stock'] > 0): ?>
+                                            <span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-circle"></i> In Stock</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php 
+                            endforeach;
+                        else:
+                        ?>
+                            <div class="col-span-2 bg-gradient-to-br from-primary to-purple-600 rounded-2xl shadow-xl p-12 text-center text-white">
+                                <i class="fas fa-shopping-cart text-6xl mb-4 opacity-80"></i>
+                                <h3 class="text-2xl font-bold mb-2">Coming Soon!</h3>
+                                <p class="text-indigo-100">Amazing products will be available shortly</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <!-- Floating badges -->
+                    <div class="absolute -top-4 -right-4 bg-yellow-400 text-yellow-900 px-6 py-3 rounded-full font-bold shadow-lg transform rotate-12 animate-pulse">
+                        <i class="fas fa-bolt mr-1"></i> Hot Deals!
+                    </div>
                 </div>
             </div>
         </div>
@@ -21,65 +111,52 @@
     <section class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Featured Products</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Product 1 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 group">
-                    <div class="relative overflow-hidden">
-                        <img src="https://picsum.photos/400/300?random=2" class="w-full h-56 object-cover transform group-hover:scale-110 transition duration-500" alt="Product">
-                        <div class="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                            <button class="bg-white text-gray-900 py-2 px-4 rounded-full font-bold hover:bg-primary hover:text-white transition duration-300">Quick View</button>
+            
+            <?php if (!empty($featuredProducts)): ?>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <?php foreach ($featuredProducts as $product): ?>
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 group">
+                            <div class="relative overflow-hidden">
+                                <?php 
+                                $imagePath = !empty($product['image']) ? 'uploads/products/' . $product['image'] : 'https://via.placeholder.com/400x300?text=No+Image';
+                                ?>
+                                <img src="<?php echo htmlspecialchars($imagePath); ?>" class="w-full h-56 object-cover transform group-hover:scale-110 transition duration-500" alt="<?php echo htmlspecialchars($product['title']); ?>">
+                                <div class="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                    <a href="?page=products" class="bg-white text-gray-900 py-2 px-4 rounded-full font-bold hover:bg-primary hover:text-white transition duration-300">Quick View</a>
+                                </div>
+                                <?php if ($product['stock'] <= 0): ?>
+                                    <div class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">Out of Stock</div>
+                                <?php elseif ($product['stock'] <= 5): ?>
+                                    <div class="absolute top-2 right-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold">Low Stock</div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="p-6">
+                                <h5 class="text-xl font-semibold text-gray-900 mb-2"><?php echo htmlspecialchars($product['title']); ?></h5>
+                                <p class="text-gray-600 mb-4 text-sm line-clamp-2"><?php echo htmlspecialchars(substr($product['description'], 0, 60)) . '...'; ?></p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-2xl font-bold text-primary">$<?php echo number_format($product['price'], 2); ?></span>
+                                    <?php if ($product['stock'] > 0): ?>
+                                        <button onclick="addToCart(<?php echo $product['id']; ?>)" class="bg-primary hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                                            <i class="fas fa-cart-plus mr-2"></i> Add
+                                        </button>
+                                    <?php else: ?>
+                                        <button disabled class="bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed flex items-center">
+                                            <i class="fas fa-ban mr-2"></i> Unavailable
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="p-6">
-                        <h5 class="text-xl font-semibold text-gray-900 mb-2">Wireless Headphones</h5>
-                        <p class="text-gray-600 mb-4 text-sm">High-quality sound with noise cancellation</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-2xl font-bold text-primary">$79.99</span>
-                            <button class="bg-primary hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition duration-300 flex items-center">
-                                <i class="fas fa-cart-plus mr-2"></i> Add
-                            </button>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-                <!-- Product 2 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 group">
-                    <div class="relative overflow-hidden">
-                        <img src="https://picsum.photos/400/300?random=3" class="w-full h-56 object-cover transform group-hover:scale-110 transition duration-500" alt="Product">
-                        <div class="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                            <button class="bg-white text-gray-900 py-2 px-4 rounded-full font-bold hover:bg-primary hover:text-white transition duration-300">Quick View</button>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h5 class="text-xl font-semibold text-gray-900 mb-2">Smart Watch</h5>
-                        <p class="text-gray-600 mb-4 text-sm">Track your fitness and stay connected</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-2xl font-bold text-primary">$199.99</span>
-                            <button class="bg-primary hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition duration-300 flex items-center">
-                                <i class="fas fa-cart-plus mr-2"></i> Add
-                            </button>
-                        </div>
-                    </div>
+            <?php else: ?>
+                <div class="text-center py-12">
+                    <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">No products available at the moment.</p>
+                    <p class="text-gray-400 text-sm mt-2">Check back soon for new arrivals!</p>
                 </div>
-                <!-- Product 3 -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 group">
-                    <div class="relative overflow-hidden">
-                        <img src="https://picsum.photos/400/300?random=4" class="w-full h-56 object-cover transform group-hover:scale-110 transition duration-500" alt="Product">
-                        <div class="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                            <button class="bg-white text-gray-900 py-2 px-4 rounded-full font-bold hover:bg-primary hover:text-white transition duration-300">Quick View</button>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h5 class="text-xl font-semibold text-gray-900 mb-2">Laptop Bag</h5>
-                        <p class="text-gray-600 mb-4 text-sm">Durable and stylish travel companion</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-2xl font-bold text-primary">$49.99</span>
-                            <button class="bg-primary hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition duration-300 flex items-center">
-                                <i class="fas fa-cart-plus mr-2"></i> Add
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php endif; ?>
+            
             <div class="text-center mt-12">
                 <a href="?page=products" class="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-full transition duration-300">View All Products</a>
             </div>
