@@ -80,9 +80,9 @@ CREATE TABLE IF NOT EXISTS contacts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert default admin user (username: admin, password: admin123)
+-- Insert default admin user (username: Savvy_Potato, password: admin123)
 INSERT INTO admins (username, password_hash) VALUES 
-('admin', '$2y$10$9oQg/xMwygZZVx98lice4.H9.mZSqr4uS5YoUxwVLP/LJQ.6S8M0O');
+('Savvy_Potato', '$2y$10$9oQg/xMwygZZVx98lice4.H9.mZSqr4uS5YoUxwVLP/LJQ.6S8M0O');
 
 -- Insert default categories
 INSERT INTO categories (name, description) VALUES 
