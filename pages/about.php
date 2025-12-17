@@ -12,7 +12,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center gap-12">
                 <div class="w-full md:w-1/2">
-                    <img src="https://picsum.photos/500/400?random=11" alt="About Us" class="rounded-lg shadow-xl w-full object-cover">
+                    <img src="assets/images/team.jpeg" alt="Our Team" class="rounded-lg shadow-xl w-full object-cover">
                 </div>
                 <div class="w-full md:w-1/2">
                     <h2 class="text-3xl font-bold text-gray-900 mb-6">Who We Are</h2>
@@ -88,29 +88,37 @@
     <section class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">Meet Our Team</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300 text-center">
-                    <img src="https://picsum.photos/300/300?random=12" class="w-full h-64 object-cover" alt="Team Member">
+                    <img src="assets/images/yasir.jpeg" class="w-full h-64 object-cover" alt="Yasir Adnan">
                     <div class="p-6">
-                        <h5 class="text-xl font-bold text-gray-900 mb-1">John Doe</h5>
+                        <h5 class="text-xl font-bold text-gray-900 mb-1">Yasir Adnan</h5>
                         <p class="text-primary font-medium mb-3">Founder & CEO</p>
-                        <p class="text-gray-600">Visionary leader with 15+ years of retail experience.</p>
+                        <p class="text-gray-600 text-sm">Visionary leader with extensive retail experience.</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300 text-center">
-                    <img src="https://picsum.photos/300/300?random=13" class="w-full h-64 object-cover" alt="Team Member">
+                    <img src="assets/images/tithi.jpeg" class="w-full h-64 object-cover" alt="Tithi Bala">
                     <div class="p-6">
-                        <h5 class="text-xl font-bold text-gray-900 mb-1">Jane Smith</h5>
-                        <p class="text-primary font-medium mb-3">Head of Marketing</p>
-                        <p class="text-gray-600">Creative mind behind our brand strategy and campaigns.</p>
+                        <h5 class="text-xl font-bold text-gray-900 mb-1">Tithi Bala</h5>
+                        <p class="text-primary font-medium mb-3">COO & Designer</p>
+                        <p class="text-gray-600 text-sm">Creative operations expert with design excellence.</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300 text-center">
-                    <img src="https://picsum.photos/300/300?random=14" class="w-full h-64 object-cover" alt="Team Member">
+                    <img src="assets/images/nasfim.jpeg" class="w-full h-64 object-cover" alt="Nasfim Tishi">
                     <div class="p-6">
-                        <h5 class="text-xl font-bold text-gray-900 mb-1">Mike Johnson</h5>
+                        <h5 class="text-xl font-bold text-gray-900 mb-1">Nasfim Tishi</h5>
+                        <p class="text-primary font-medium mb-3">Managing Director</p>
+                        <p class="text-gray-600 text-sm">Strategic leadership and business development.</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300 text-center">
+                    <img src="assets/images/rakib.jpeg" class="w-full h-64 object-cover" alt="Rakibul Hasan">
+                    <div class="p-6">
+                        <h5 class="text-xl font-bold text-gray-900 mb-1">Rakibul Hasan</h5>
                         <p class="text-primary font-medium mb-3">Product Manager</p>
-                        <p class="text-gray-600">Ensures we always have the best products in stock.</p>
+                        <p class="text-gray-600 text-sm">Ensures the best product selection and quality.</p>
                     </div>
                 </div>
             </div>
